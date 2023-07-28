@@ -1,0 +1,97 @@
+<!DOCTYPE html >
+<html lang='de' >
+<head >
+    <meta charset='UTF-8' />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content="width=device-width,height=device-height, initial-scale=1, shrink-to-fit=yes">
+    <!-- <meta name='language' content='DE' > -->
+    <!-- <meta name='robots' content='index, follow' /> -->
+
+    <meta name='description' content='Tracker' />
+    <meta name='subject' content='' >
+    <meta name='keywords' content='' />
+
+    <meta name='author' content='Project Dingens' >
+    <meta name='copyright' content='Project Dingens' >
+    <meta name='designer' content='Project Dingens' >
+    <meta name='owner' content='Project Dingens' >
+
+    <!--theme colors -->
+    <meta name="theme-color" content="" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <base href='https://manuelbo.github.io/trackapp/' target='_blank' >
+
+
+    <title >TrackAPP</title>
+
+    <script type='text/javascript' src='assets/thirdparty/jquery-3.7.0.min.js' ></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <link rel='stylesheet' href='assets/main.css' />
+    <style type='text/css' >
+        .d-none {
+            display: none;
+        }
+    </style>
+
+    <link rel='icon' href='./favicon.ico' type='image/x-icon' >
+    <link rel='manifest' href='manifest.json' crossorigin='use-credentials' />
+
+
+</head>
+<body >
+    <!-- <meter id="disk_c" value="2" min="0" max="10">2 out of 10</meter><br> -->
+
+    <header class="header" >
+        <!-- <button class="nav--toggle" ></button>
+        <nav  class="nav" >
+            <ul class="nav--wrapper" >
+                <li class="nav--item" ></li>
+            </ul>
+        </nav> -->
+
+    </header>
+
+    <main class="main-content" id="main" >
+
+        <div id='map' style='width:360px; height:180px;' ></div>
+
+        <div class='stop-watch' ></div>
+        <button class='start-tracking' data-action='start' >Start</button>
+        <button class='start-tracking restart-tracking' data-action='restart' disabled >Restart</button>
+        <button class='stop-tracking' disabled >Stop Tracking</button>
+
+
+
+        <form action='' method='POST' name='storerun' class='d-none' >
+            <label for='storerun_distance' >Distance (in km)</label>
+            <input id='storerun_distance' type='number' name='distance' val='' class='' readonly />
+
+            <label for='storerun_time' >Time</label>
+            <input id='storerun_time' type='text' name='time' val='' class='' readonly />
+
+            <button type='submit' class='' name='submit' >Save</button>
+        </form>
+
+
+        <button class='export_database' >Export Database</button>
+
+
+    </main>
+
+    <footer class="footer" >
+        <div class="scripts-wrapper d-none" >
+            <!-- <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script> -->
+            <script type='text/javascript' src='assets/thirdparty/leaflet-1.9.4.js' ></script>
+
+            <script type='text/javascript' src='assets/main.js' ></script>
+            <!-- <script type='text/javascript' src='assets/serviceworker.js' ></script> -->
+        </div>
+    </footer>
+</body>
+</html>

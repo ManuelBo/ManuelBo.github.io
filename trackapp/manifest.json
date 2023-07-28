@@ -1,0 +1,10 @@
+{
+    "name": "TrackApp",
+    "short_name": "TrackApp",
+    "lang": "de-DE",
+    "start_url": "TrackApp/index.html",
+    "display": "standalone",
+    "background_color": "#c0c0c0",
+    "theme_color": "#FFF",
+    "description": "Homepage of TrackApp"
+  }

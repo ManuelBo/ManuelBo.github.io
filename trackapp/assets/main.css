@@ -1,0 +1,39 @@
+html, 
+body {
+    width: 100%;
+    height: 100%;
+}
+
+:root {
+    --c-white: #FFF;
+    --c-black: #000;
+    --c-dark: #121212;
+}
+
+:root {
+    --bg: var(--c-white);
+    --color: var(--c-black);
+
+    --bg-alt: var(--c-white);
+    --color-alt: var(--c-black);
+
+    --color-btn: var(--color);
+
+
+    --box-shadow-alt: 0 0 0 0.25rem var(--color-alt);
+}
+
+.header, 
+.footer,
+.main-content {
+    color: var(--color-alt);
+    background-color: var(--bg-alt);
+    height: 5vh;
+}
+
+.main-content {
+    color: var(--color);
+    background-color: var(--bg);
+    height: 90vh;
+}
+
