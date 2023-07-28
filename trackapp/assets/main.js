@@ -112,12 +112,24 @@ jQuery(document).ready(async function($){
             };
             let exportData = JSON.stringify(results, replacerFunc(results));
 
-            jQuery(document).trigger('exportData', [exportData, 'Backup-Export of TrackApp-Database', 'json']);
+            jQuery(document).trigger('exportData', [exportData, 'Backup-Export-TrackApp-Database', 'json']);
         });
 
     });
 
 });
+
+// ----------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------
+
+/**
+ * Check if it's an mobile device
+ * 
+ * @return {Boolean}
+ */
+function isMobileDevice(){
+    return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase())
+}
 
 // ----------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------
@@ -914,41 +926,77 @@ async function initAPIIndexedDB(){
 async function exportFile(exportData, description='', accept='json'){
     switch( accept ){
         case 'text':
-            accept = {
-                "text/plain": [".txt"],
-            }
+            contentType = 'text/plain';
+            acceptTypes =  [".txt"];
+            break;
+
+        case 'csv':
+            contentType = 'text/csv';
+            acceptTypes =  ['.csv', '.txt'];
             break;
 
         case 'text':
-            accept = {
-                'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
-            }
+            contentType = 'image/*';
+            acceptTypes = ['.png', '.gif', '.jpeg', '.jpg'];
             break;
-
 
         case 'json':
         default:
-            accept = {
-                "application/json": [".json"],
-            }
+            contentType = 'application/json';
+            acceptTypes =  [".json"];
     }
 
     const options = {
         types: [
             {
                 description: description,
-                accept: accept,
+                accept: {
+                    contentType : acceptTypes,
+                },
             },
         ],
         excludeAcceptAllOption: true,
         multiple: false,
     };
     
-    const handle = await window.showSaveFilePicker(options);
-    const writable = await handle.createWritable();
+    // mobile devices don't support FileAPI
+    if( isMobileDevice() ){
+        let blob = new Blob([exportData], {type: `${contentType};charset=utf-8;`});
+        filename = description;
+
+        if (typeof window.navigator.msSaveBlob !== 'undefined') {
+            // IE workaround for "HTML7007: One or more blob URLs were revoked by closing the blob for which they were created. These URLs will no longer resolve as the data backing the URL has been freed."
+            window.navigator.msSaveBlob(blob, filename);
+        } else {
+            var URL = window.URL || window.webkitURL;
+            var downloadUrl = URL.createObjectURL(blob);
     
-    await writable.write(exportData);
-    await writable.close();
+            if (filename) {
+                // use HTML5 a[download] attribute to specify filename
+                var a = document.createElement("a");
+                // safari doesn't support this yet
+                if (typeof a.download === 'undefined') {
+                    window.location.href = downloadUrl;
+                } else {
+                    a.href = downloadUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                }
+            } else {
+                window.location.href = downloadUrl;
+            }
+    
+            setTimeout(function () { URL.revokeObjectURL(downloadUrl); }, 100); // cleanup
+        }
+    
+    }else{
+        const handle = await window.showSaveFilePicker(options);
+        const writable = await handle.createWritable();
+        
+        await writable.write(exportData);
+        await writable.close();
+    }
 
     return true;
 }
@@ -958,6 +1006,36 @@ async function exportFile(exportData, description='', accept='json'){
  */
 jQuery(document).on('exportData', async function(e, exportData, description, accept){
     return await exportFile(exportData, description, accept);
+});
+
+// ----------------------------------------------------------------------------------------------------
+// --------------------------------- Something --------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------
+
+/**
+ * Trigger Mail-Dialog with preset data
+ * 
+ * @param {String} to valid mail
+ * @param {String} subject (optional) subject
+ * @param {String} body (optional) body
+ * @returns 
+ */
+function sendMail(to, subject='', body=''){
+
+    let mailto = `mailto:${to}?`;
+    mailto += ( subject && 'string' == typeof subject )? `&subject=${subject}` : '';
+    mailto += ( body && 'string' == typeof body )? `&body=${body}` : '';
+
+    window.location = "mailto:"+to+'?subject='+emailSub+'&body='+emailBody;
+
+    return true;
+}
+
+/**
+ * @see sendMail
+ */
+jQuery(document).on('sendMail', async function(e, target, subject, body){
+    return await sendMail(target, subject, body);
 });
 
 // ----------------------------------------------------------------------------------------------------
