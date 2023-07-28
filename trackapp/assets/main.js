@@ -589,7 +589,7 @@ const dbversion = 1;
 
 const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
 // const db = await initDb();
-// const db = null;
+var db = null;
 
 /**
  * Init IndexedDB
@@ -887,7 +887,7 @@ async function initAPIIndexedDB(){
     // });
 
     // init database
-    const db = await initDb();
+    db = await initDb();
     // jQuery.when(jQuery(document).trigger('indexDBGetDatabase')).when(function(database){
     //     const db = database;
     // });
