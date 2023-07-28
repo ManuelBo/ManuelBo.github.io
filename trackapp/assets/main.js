@@ -51,6 +51,17 @@ jQuery(document).ready(async function($){
     });
 
     jQuery(document).on('click', '.start-tracking:not([disabled])', function(e){
+        // recenter map
+        jQuery(document).trigger('geolocationPinglocation', [
+            function(GeolocationPosition){
+                // recenter map
+                jQuery(document).trigger('leafletRecenterMap', [GeolocationPosition.coords.latitude, GeolocationPosition.coords.longitude]);
+    
+                // // start watching location
+                // jQuery(document).trigger('geolocationwatchPosition', glUpdatePosition);
+            }
+        ]);
+
         // start watching location
         jQuery(document).trigger('geolocationwatchPosition', glUpdatePosition);
     });
