@@ -51,6 +51,17 @@ jQuery(document).ready(async function($){
     });
 
     jQuery(document).on('click', '.start-tracking:not([disabled])', function(e){
+        // recenter map
+        jQuery(document).trigger('geolocationPinglocation', [
+            function(GeolocationPosition){
+                // recenter map
+                jQuery(document).trigger('leafletRecenterMap', [GeolocationPosition.coords.latitude, GeolocationPosition.coords.longitude]);
+    
+                // // start watching location
+                // jQuery(document).trigger('geolocationwatchPosition', glUpdatePosition);
+            }
+        ]);
+
         // start watching location
         jQuery(document).trigger('geolocationwatchPosition', glUpdatePosition);
     });
@@ -80,39 +91,28 @@ jQuery(document).ready(async function($){
     jQuery(document).on('click', '.export_database', async function(e){
         e.preventDefault();
 
-        jQuery.when(jQuery(document).trigger('indexDBGetAllEntries')).then(async function(e, data='Asd'){
-            console.log('export_database', e, data);
+        jQuery.when(jQuery(document).trigger('indexDBGetAllEntries')).then(async function(results){
 
-            let cursor = e.target.result;
-            if (cursor) {
-                let key = cursor.primaryKey;
-                let value = cursor.value;
-                console.log(key, value);
-                cursor.continue();
-            }
-            else {
-                // no more results
-            }
-
-            data = 'asfd';
-
-            const options = {
-                types: [
-                    {
-                        description: 'Backup-Export of TrackApp-Database',
-                        accept: {
-                            // "text/plain": [".txt"],
-                            'application/json' : ['.json'],
-                        },
-                    },
-                ],
+            /**
+             * Prevent "Converting circular structure to JSON"-Error
+             * 
+             * @returns 
+             */
+            const replacerFunc = () => {
+                const visited = new WeakSet();
+                return (key, value) => {
+                  if (typeof value === "object" && value !== null) {
+                    if (visited.has(value)) {
+                      return;
+                    }
+                    visited.add(value);
+                  }
+                  return value;
+                };
             };
-            
-            const handle = await window.showSaveFilePicker(options);
-            const writable = await handle.createWritable();
-            
-            await writable.write(data);
-            await writable.close();
+            let exportData = JSON.stringify(results, replacerFunc(results));
+
+            jQuery(document).trigger('exportData', [exportData, 'Backup-Export of TrackApp-Database', 'json']);
         });
 
     });
@@ -897,6 +897,68 @@ async function initAPIIndexedDB(){
 
     return true;
 }
+
+// ----------------------------------------------------------------------------------------------------
+// --------------------------------- FileSystemFileHandle ---------------------------------------------
+// ----------------------------------------------------------------------------------------------------
+
+/**
+ * Export some Data to Filesystem
+ * 
+ * @param {String} exportData 
+ * @param {String} description (optional)
+ * @param {String} accept (optional) Default: 'json'
+ * 
+ * @return {true}
+ */
+async function exportFile(exportData, description='', accept='json'){
+    switch( accept ){
+        case 'text':
+            accept = {
+                "text/plain": [".txt"],
+            }
+            break;
+
+        case 'text':
+            accept = {
+                'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+            }
+            break;
+
+
+        case 'json':
+        default:
+            accept = {
+                "application/json": [".json"],
+            }
+    }
+
+    const options = {
+        types: [
+            {
+                description: description,
+                accept: accept,
+            },
+        ],
+        excludeAcceptAllOption: true,
+        multiple: false,
+    };
+    
+    const handle = await window.showSaveFilePicker(options);
+    const writable = await handle.createWritable();
+    
+    await writable.write(exportData);
+    await writable.close();
+
+    return true;
+}
+
+/**
+ * @see exportFile
+ */
+jQuery(document).on('exportData', async function(e, exportData, description, accept){
+    return await exportFile(exportData, description, accept);
+});
 
 // ----------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------
